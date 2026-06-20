@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lakshay Sharma | Full-Stack Core Engineer</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* --- CORE DESIGN SYSTEM MATRIX --- */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        /* Variables defining alternating theme architecture modes */
+        :root {
+            --bg: #080C18;
+            --bg-secondary: #0E1525;
+            --card-bg: #141B2D;
+            --text-main: #E8E6F5;
+            --text-muted: #7B7A92;
+            --primary: #7B2FFF;
+            --primary-glow: rgba(123, 47, 255, 0.25);
+            --accent: #00FFD1;
+            --accent-glow: rgba(0, 255, 209, 0.15);
+            --border: rgba(123, 47, 255, 0.18);
+            --glass-panel: rgba(20, 27, 45, 0.65);
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            transition: background 0.8s cubic-bezier(0.25, 1, 0.5, 1), color 0.8s ease;
+        }
+
+        /* Earthy Theme Variable Configuration Overrides */
+        [data-theme="earthy"] {
+            --bg: #F4EDD9;
+            --bg-secondary: #EADFC9;
+            --card-bg: #DFD3B7;
+            --text-main: #1C2E24;
+            --text-muted: #536B5C;
+            --primary: #2E5A1C;
+            --primary-glow: rgba(46, 90, 28, 0.2);
+            --accent: #D25D27;
+            --accent-glow: rgba(210, 93, 39, 0.15);
+            --border: rgba(46, 90, 28, 0.25);
+            --glass-panel: rgba(223, 211, 183, 0.7);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Fine Webkit Scrollbar Engineering */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+
+        /* --- BACKGROUND ENGINE OVERLAYS --- */
+        .fixed-canvas-container {
+            position: fixed;
+            top: 0; right: 0;
+            width: 50vw; height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+            transition: width 0.5s ease;
+        }
+
+        /* --- THEME CONTROLLER FLOATER --- */
+        .theme-switcher-node {
+            position: fixed; bottom: 30px; right: 30px;
+            z-index: 500;
+            background: var(--glass-panel);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 8px 16px; border-radius: 30px;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .theme-switcher-node span {
+            font-family: var(--font-code); font-size: 11px;
+            letter-spacing: 1px; font-weight: bold;
+        }
+        .indicator-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* --- APPLICATION NAVBAR --- */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 60px;
+            background: rgba(8, 12, 24, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .logo-block {
+            font-family: var(--font-display); font-size: 24px; font-weight: 700;
+            letter-spacing: -0.5px; color: var(--primary);
+        }
+        .logo-block span { color: var(--accent); }
+        .nav-links { display: flex; gap: 40px; list-style: none; }
+        .nav-links a {
+            font-size: 14px; color: var(--text-muted); text-decoration: none;
+            font-weight: 500; letter-spacing: 0.5px; transition: color 0.2s ease;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+
+        /* --- STRUCTURAL CORE LAYOUT --- */
+        section {
+            position: relative; z-index: 10;
+            padding: 120px 60px;
+            min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+
+        .section-label {
+            font-family: var(--font-code); font-size: 11px; font-weight: 700;
+            letter-spacing: 4px; color: var(--primary); margin-bottom: 15px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .section-label::before { content: ''; width: 35px; height: 1px; background: var(--primary); }
+        
+        .section-title {
+            font-family: var(--font-display); font-size: clamp(36px, 4vw, 56px);
+            font-weight: 700; letter-spacing: -1.5px; margin-bottom: 60px;
+        }
+
+        /* --- HERO VIEW --- */
+        #hero-environment {
+            width: 55%; padding-top: 160px;
+        }
+        .hero-eyebrow {
+            font-family: var(--font-code); font-size: 12px; color: var(--accent);
+            letter-spacing: 3px; font-weight: 500; margin-bottom: 25px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .hero-eyebrow::before { content: '//'; color: var(--primary); }
+        .hero-title {
+            font-family: var(--font-display); font-size: clamp(48px, 6vw, 84px);
+            font-weight: 700; line-height: 1.05; letter-spacing: -2.5px; margin-bottom: 10px;
+        }
+        .title-outline-eng {
+            -webkit-text-stroke: 1.5px var(--primary); color: transparent;
+        }
+        .dynamic-writer-console {
+            font-family: var(--font-display); font-size: clamp(22px, 2.5vw, 32px);
+            color: var(--text-muted); margin: 20px 0 30px; min-height: 40px;
+        }
+        .target-string-container { color: var(--accent); font-weight: 600; }
+        .cursor-node { color: var(--primary); animation: blnk 0.8s step-end infinite; }
+        @keyframes blnk { 0%, 100% { opacity: 1 } 50% { opacity: 0 } }
+
+        .hero-description-block {
+            font-size: 16px; color: var(--text-muted); line-height: 1.8;
+            max-width: 480px; margin-bottom: 50px;
+        }
+        .action-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        
+        .btn-fill {
+            font-family: var(--font-display); font-size: 14px; font-weight: 600;
+            padding: 16px 36px; border-radius: 8px; background: var(--primary);
+            color: #fff; text-decoration: none; border: none; cursor: pointer;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: transform 0.2s, background 0.3s;
+        }
+        .btn-fill:hover { transform: translateY(-2px); background: var(--accent); color: #000; }
+        
+        .btn-outline {
+            font-family: var(--font-display); font-size: 14px; font-weight: 500;
+            padding: 16px 36px; border-radius: 8px; border: 1px solid var(--border);
+            color: var(--text-main); text-decoration: none; background: transparent;
+            cursor: pointer; transition: border 0.3s, transform 0.2s;
+        }
+        .btn-outline:hover { border-color: var(--primary); transform: translateY(-2px); }
+
+        /* --- GRID SYSTEM PLATFORM FOR PROJECTS --- */
+        .matrix-projects-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+            width: 85%;
+        }
+        .project-quantum-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 16px; padding: 36px; position: relative;
+            overflow: hidden; cursor: default; will-change: transform;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .card-icon-wrapper {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; margin-bottom: 24px;
+            background: var(--primary-glow); border: 1px solid var(--border);
+        }
+        .card-title-node {
+            font-family: var(--font-display); font-size: 20px; font-weight: 600;
+            margin-bottom: 12px; letter-spacing: -0.3px;
+        }
+        .card-body-text {
+            font-size: 14px; color: var(--text-muted); line-height: 1.75; margin-bottom: 24px;
+        }
+        .tag-capsule-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+        .tag-capsule {
+            font-family: var(--font-code); font-size: 11px; padding: 4px 12px;
+            border-radius: 20px; background: rgba(0,0,0,0.15); border: 1px solid var(--border);
+        }
+        .card-action-anchor {
+            font-size: 13px; font-weight: 600; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px; color: var(--primary);
+            transition: gap 0.2s ease;
+        }
+        .card-action-anchor:hover { gap: 12px; color: var(--accent); }
+
+        /* --- SKILLS METRICS --- */
+        .skills-split-layout {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 80px; width: 90%;
+        }
+        .bars-stack { display: flex; flex-direction: column; gap: 32px; }
+        .metric-unit-node { position: relative; }
+        .metric-meta {
+            display: flex; justify-content: space-between; margin-bottom: 12px;
+        }
+        .metric-title { font-family: var(--font-display); font-size: 16px; font-weight: 500; }
+        .metric-pct { font-family: var(--font-code); font-size: 13px; color: var(--accent); }
+        .metric-track {
+            height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden;
+        }
+        .metric-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px; transition: width 1.5s cubic-bezier(0.1, 1, 0.1, 1);
+        }
+
+        /* Certs Node */
+        .certifications-matrix-box { margin-top: 60px; }
+        .cert-row-stack { display: flex; gap: 16px; flex-wrap: wrap; }
+        .cert-token {
+            font-family: var(--font-body); font-size: 14px; padding: 14px 28px;
+            border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .cert-pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+        /* --- ABOUT ENVIRONMENT INTERACTION --- */
+        .about-split-grid {
+            display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; align-items: center;
+        }
+        .about-narrative p {
+            font-size: 16px; color: var(--text-muted); line-height: 1.85; margin-bottom: 24px;
+        }
+        .terminal-panel-mock {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+        .terminal-header {
+            padding: 16px 24px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border);
+            display: flex; gap: 8px;
+        }
+        .t-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .t-r { background: #FF5F56; } .t-y { background: #FFBD2E; } .t-g { background: #27C93F; }
+        .terminal-payload-box {
+            padding: 32px; font-family: var(--font-code); font-size: 13px; line-height: 2;
+        }
+        .c-kw { color: var(--primary); } .c-fn { color: var(--accent); } .c-str { color: #FF8C61; }
+
+        /* --- CONTACT DATABASE PIPELINE SECTION --- */
+        .contact-workspace {
+            max-width: 650px; width: 100%;
+        }
+        .form-cluster {
+            display: flex; flex-direction: column; gap: 20px; margin-top: 40px;
+        }
+        .input-group { position: relative; }
+        .input-field {
+            width: 100%; padding: 16px 20px; background: var(--card-bg);
+            border: 1px solid var(--border); border-radius: 8px; color: var(--text-main);
+            font-family: var(--font-body); font-size: 15px; outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-field:focus { border-color: var(--accent); }
+        textarea.input-field { min-height: 150px; resize: vertical; }
+        
+        /* --- APPLICATION FOOTER --- */
+        footer {
+            padding: 40px 60px; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.05); position: relative; z-index: 10;
+        }
+        .footer-logo { font-family: var(--font-code); font-size: 12px; color: var(--text-muted); }
+
+        /* --- SCROLL ANIMATION NODES --- */
+        .scroll-reveal-node {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .scroll-reveal-node.revealed-active { opacity: 1; transform: translateY(0); }
+
+        /* --- ADAPTIVE GRAPHIC RESPONSIVENESS MATRIX --- */
+        @media (max-width: 1024px) {
+            .fixed-canvas-container { width: 100vw; opacity: 0.15; }
+            #hero-environment, .matrix-projects-grid, .skills-split-layout { width: 100%; }
+            .matrix-projects-grid, .skills-split-layout, .about-split-grid { grid-template-columns: 1fr; }
+            section { padding: 100px 24px; }
+            nav { padding: 20px 24px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fixed-canvas-container" id="canvas-frame-host">
+        <canvas id="canvas3d" style="width: 100%; height: 100%; display: block;"></canvas>
+    </div>
+
+    <div class="theme-switcher-node" id="theme-trigger-engine">
+        <div class="indicator-dot"></div>
+        <span id="theme-string-label">NEON DARK MODE</span>
+    </div>
+
+    <nav>
+        <div class="logo-block">LAKSHAY<span>.</span>SHARMA</div>
+        <ul class="nav-links">
+            <li><a href="#projects-environment">Engineering Logs</a></li>
+            <li><a href="#skills-environment">Core Matrix</a></li>
+            <li><a href="#about-environment">Biographical Data</a></li>
+            <li><a href="#contact-environment">Establish Connection</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        
+        <section id="hero-environment">
+            <div class="hero-eyebrow">SYSTEM EXPANSION ACTIVE</div>
+            <h1 class="hero-title">
+                Lakshay <br/>
+                <span class="title-outline-eng">Sharma</span>
+            </h1>
+            <div class="dynamic-writer-console">
+                Core <span class="target-string-container" id="terminal-typewriter"></span><span class="cursor-node">_</span>
+            </div>
+            <p class="hero-description-block">
+                B.E. Computer Science Engineering undergraduate student at Chitkara University. 
+                Architecting high-availability full-stack pipelines, computational optimization vectors, and native platform systems.
+            </p>
+            <div class="action-row">
+                <a href="#projects-environment" class="btn-fill">Analyze Architectures →</a>
+                <a href="https://github.com/lakshaydotcom" target="_blank" class="btn-outline">Secure Access Repositories</a>
+            </div>
+        </section>
+
+        <section id="projects-environment">
+            <div class="section-label">PRODUCTION COMPILATIONS</div>
+            <h2 class="section-title">Verified Systems</h2>
+            
+            <div class="matrix-projects-grid" id="target-projects-injector">
+                </div>
+        </section>
+
+        <section id="skills-environment">
+            <div class="section-label">COMPUTATIONAL CAPACITY</div>
+            <h2 class="section-title">Language & Engine Architecture</h2>
+            
+            <div class="skills-split-layout">
+                <div class="bars-stack" id="target-skills-injector">
+                    </div>
+                <div class="bars-stack">
+                    <p style="color: var(--text-muted); line-height: 1.8; font-size: 15px;">
+                        Continuous verification of full-stack operational skills across distributed environment variables, backend structures, hardware acceleration logic, and memory-safe code models.
+                    </p>
+                    
+                    <div class="certifications-matrix-box">
+                        <h4 style="font-family: var(--font-display); font-size: 18px; margin-bottom: 20px;">System Credentials</h4>
+                        <div class="cert-row-stack">
+                            <div class="cert-token"><div class="cert-pulse-dot"></div>CodeChef Codethon Certificate Vector</div>
+                            <div class="cert-token"><div class="cert-pulse-dot"></div>Infosys Springboard Verified Stack Path</div>
+                            <div class="cert-token"><div class="cert-pulse-dot"></div>Chitkara Academy Engineering Validation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about-environment">
+            <div class="about-split-grid">
+                <div class="about-narrative scroll-reveal-node">
+                    <div class="section-label">ORIGIN STRUCT MATRIX</div>
+                    <h2 class="section-title" style="margin-bottom: 30px;">About the Engineer</h2>
+                    <p>I am a second-year Computer Science Engineering student based out of Chitkara University, driven by the absolute imperative to learn by shipping functional computational models.</p>
+                    <p>My current research and focus paths embrace Operating System architectures, Digital Electronics logic array synthesis, and Computer Architecture parsing.</p>
+                </div>
+                
+                <div class="terminal-panel-mock scroll-reveal-node">
+                    <div class="terminal-header">
+                        <div class="t-dot t-r"></div><div class="t-dot t-y"></div><div class="t-dot t-g"></div>
+                    </div>
+                    <div class="terminal-payload-box">
+                        <span class="c-kw">#include</span> <span class="c-str">&lt;stdio.h&gt;</span><br/>
+                        <span class="c-kw">int</span> <span class="c-fn">main</span>() {<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;Engineer lakshay = {<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.university = <span class="c-str">"Chitkara_HP"</span>,<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.status = <span class="c-str">"Continuous_Deployment"</span>,<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.capabilities = [<span class="c-str">"C"</span>, <span class="c-str">"JS"</span>, <span class="c-str">"Full-Stack"</span>]<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;};<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-fn">printf</span>(<span class="c-str">"System Ready.\n"</span>);<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-kw">return</span> 0;<br/>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact-environment">
+            <div class="section-label">SECURE DATA INTERCHANGE</div>
+            <h2 class="section-title">Establish Communications Pipeline</h2>
+            
+            <div class="contact-workspace scroll-reveal-node">
+                <form id="portfolio-data-pipeline-form" class="form-cluster">
+                    <div class="input-group">
+                        <input type="text" id="form-inq-name" class="input-field" placeholder="Identity String / Full Name" required />
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="form-inq-email" class="input-field" placeholder="Routing Node Email Address" required />
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="form-inq-subject" class="input-field" placeholder="Transmission Subject Context" />
+                    </div>
+                    <div class="input-group">
+                        <textarea id="form-inq-payload" class="input-field" placeholder="Data Payload Package (Your message...)" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-fill" style="width: 100%;">Transmit Struct Package</button>
+                </form>
+                <div id="form-status-receipt" style="margin-top:20px; font-family:var(--font-code); font-size:13px;"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <span class="footer-logo">© [2026] LAKSHAY SHARMA — SYSTEM COMPILED APEX ENGINE RUNNING</span>
+        <span class="footer-logo" style="color: var(--primary);">NODEJS_BACKEND_BOUND</span>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // --- DATA INJECTION MATRIX ARCHITECTURE ---
+        const projectDataPayload = [
+            {
+                id: "apex_fitness",
+                title: "Apex Fitness AI Tracker",
+                desc: "AI-driven physical metric analytics platform processing user biomechanic trends using native client-side engine architectures.",
+                tech: ["JavaScript", "Neural Compute", "Web Matrix"],
+                icon: "🏋️", color: "#00FFD1", link: "https://github.com/lakshaydotcom/Apex-Fitness-AI-Tracker"
+            },
+            {
+                id: "threatsight",
+                title: "ThreatSight Ecosystem",
+                desc: "Cybersecurity optimization pipeline built using absolute strictly-typed paradigms designed to calculate modern digital exploit profiles.",
+                tech: ["TypeScript", "Security Vector", "Network Kernel"],
+                icon: "🛡️", color: "#7B2FFF", link: "https://github.com/lakshaydotcom/threatsight"
+            },
+            {
+                id: "cpp_learning",
+                title: "C++ Structural Learning Matrix",
+                desc: "Reactive interface platform combining dynamic syntax tree evaluations, custom playgrounds, and structural tracking metrics.",
+                tech: ["React.js", "AST Compilers", "State Engine"],
+                icon: "💻", color: "#FF8C61", link: "https://github.com/lakshaydotcom"
+            },
+            {
+                id: "hostel_system",
+                title: "Core C Hostel Allocation System",
+                desc: "Low-level system application written natively in bare metal procedural logic parsing secure multi-structure standard file records.",
+                tech: ["C Language", "File Structure I/O", "Buffer Parsers"],
+                icon: "🏠", color: "#DFD3B7", link: "https://github.com/lakshaydotcom/Hostel-Management-Systum"
+            }
+        ];
+
+        const skillMatrixPayload = [
+            { name: "Vanilla JavaScript Core / Architecture Models", pct: 86 },
+            { name: "Low Level Procedural Systems Architecture (C / C++)", pct: 78 },
+            { name: "HyperText Engine Standard Rendering (HTML5 / CSS3)", pct: 90 },
+            { name: "Reactive Framework Component Modularity (React.js)", pct: 68 },
+            { name: "Strictly Typed Application Logic Layering (TypeScript)", pct: 62 },
+            { name: "Distributed VCS Deployment Architecture (Git Engine)", pct: 80 }
+        ];
+
+        // --- COMPONENT INJECTION EXECUTOR ---
+        const projectGridNode = document.getElementById('target-projects-injector');
+        projectDataPayload.forEach(proj => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'project-quantum-card scroll-reveal-node';
+            wrapper.innerHTML = `
+                <div class="card-icon-wrapper" style="color:${proj.color}">${proj.icon}</div>
+                <div class="card-title-node">${proj.title}</div>
+                <p class="card-body-text">${proj.desc}</p>
+                <div class="tag-capsule-row">
+                    ${proj.tech.map(t => `<span class="tag-capsule">${t}</span>`).join('')}
+                </div>
+                <a href="${proj.link}" target="_blank" class="card-action-anchor" data-metrics-id="${proj.id}">
+                    Examine Codebase Source <span>→</span>
+                </a>
+            `;
+            
+            // 3D Matrix Rotation Micro-Interaction Engine Hook
+            wrapper.addEventListener('mousemove', (e) => {
+                const matrixGeoBox = wrapper.getBoundingClientRect();
+                const computeX = (e.clientX - matrixGeoBox.left) / matrixGeoBox.width - 0.5;
+                const computeY = (e.clientY - matrixGeoBox.top) / matrixGeoBox.height - 0.5;
+                
+                wrapper.style.transform = `perspective(800px) rotateY(${computeX * 12}deg) rotateX(${-computeY * 12}deg) translateY(-4px)`;
+                wrapper.style.boxShadow = `0 15px 35px var(--primary-glow)`;
+                wrapper.style.borderColor = varColorTarget();
+            });
+
+            wrapper.addEventListener('mouseleave', () => {
+                wrapper.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) translateY(0)';
+                wrapper.style.boxShadow = 'none';
+                wrapper.style.borderColor = '';
+            });
+
+            projectGridNode.appendChild(wrapper);
+        });
+
+        function varColorTarget() {
+            return document.documentElement.getAttribute('data-theme') === 'earthy' ? '#2E5A1C' : '#00FFD1';
+        }
+
+        const skillStackNode = document.getElementById('target-skills-injector');
+        skillMatrixPayload.forEach(skill => {
+            const container = document.createElement('div');
+            container.className = 'metric-unit-node scroll-reveal-node';
+            container.innerHTML = `
+                <div class="metric-meta">
+                    <span class="metric-title">${skill.name}</span>
+                    <span class="metric-pct">${skill.pct}%</span>
+                </div>
+                <div class="metric-track">
+                    <div class="metric-fill" data-metric-limit="${skill.pct}"></div>
+                </div>
+            `;
+            skillStackNode.appendChild(container);
+        });
+
+        // --- CONSOLE CONTROLLED TYPEWRITER CONTROLLER ---
+        const arrayStringsSequence = ["System Architect", "Full-Stack Engineer", "Procedural C Builder", "Open Source Core Learner"];
+        let sequenceIndex = 0, charIdx = 0, phaseErasing = false;
+        const targetOutputElement = document.getElementById('terminal-typewriter');
+
+        function executeTypeCycle() {
+            const targetedString = arrayStringsSequence[sequenceIndex];
+            if (!phaseErasing) {
+                targetOutputElement.textContent = targetedString.slice(0, charIdx + 1);
+                charIdx++;
+                if (charIdx === targetedString.length) {
+                    phaseErasing = true;
+                    setTimeout(executeTypeCycle, 2000);
+                    return;
+                }
+            } else {
+                targetOutputElement.textContent = targetedString.slice(0, charIdx - 1);
+                charIdx--;
+                if (charIdx === 0) {
+                    phaseErasing = false;
+                    sequenceIndex = (sequenceIndex + 1) % arrayStringsSequence.length;
+                    setTimeout(executeTypeCycle, 400);
+                    return;
+                }
+            }
+            setTimeout(executeTypeCycle, phaseErasing ? 30 : 80);
+        }
+        executeTypeCycle();
+
+        // --- OBSERVER CONFIGURATION FOR DISPLAY TRIGGERS ---
+        const applicationGlobalObserver = new IntersectionObserver((elementsReceived) => {
+            elementsReceived.forEach(element => {
+                if (element.isIntersecting) {
+                    element.target.classList.add('revealed-active');
+                    element.target.querySelectorAll('.metric-fill').forEach(bar => {
+                        bar.style.width = bar.dataset.metricLimit + '%';
+                    });
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.scroll-reveal-node').forEach(node => applicationGlobalObserver.observe(node));
+
+        // --- BACKEND API PIPELINE CONNECTION WORKER ---
+        document.getElementById('portfolio-data-pipeline-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const logBox = document.getElementById('form-status-receipt');
+            logBox.style.color = 'var(--text-main)';
+            logBox.textContent = "Packing and encrypting payload struct...";
+
+            const packet = {
+                name: document.getElementById('form-inq-name').value,
+                email: document.getElementById('form-inq-email').value,
+                subject: document.getElementById('form-inq-subject').value,
+                message: document.getElementById('form-inq-payload').value
+            };
+
+            try {
+                const transportLayerResponse = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(packet)
+                });
+                const responseData = await transportLayerResponse.json();
+                
+                if (responseData.status === 'success') {
+                    logBox.style.color = 'var(--accent)';
+                    logBox.textContent = "Transmission successful. Struct written to Node.js backend ledger.";
+                    document.getElementById('portfolio-data-pipeline-form').reset();
+                } else {
+                    throw new Error(responseData.message);
+                }
+            } catch (err) {
+                logBox.style.color = '#FF5F56';
+                logBox.textContent = `Transmission failed: Endpoint unreachable. Ensure 'node server.js' is running.`;
+            }
+        });
+
+        // Trigger analytics engine trackers automatically
+        document.querySelectorAll('[data-metrics-id]').forEach(linkNode => {
+            linkNode.addEventListener('click', () => {
+                fetch('/api/metrics/click', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ elementId: linkNode.dataset.metricsId })
+                }).catch(() => {}); // Silent failure mitigation parameter
+            });
+        });
+
+        // --- WEBGL HIGH-PERFORMANCE THREE.JS ENVIRONMENT AND SHADER ENGINE ---
+        const canvasDomNode = document.getElementById('canvas3d');
+        const containerHost = document.getElementById('canvas-frame-host');
+        
+        let widthCalculated = containerHost.offsetWidth;
+        let heightCalculated = containerHost.offsetHeight;
+
+        const webglRendererInstance = new THREE.WebGLRenderer({ canvas: canvasDomNode, alpha: true, antialias: true });
+        webglRendererInstance.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        webglRendererInstance.setSize(widthCalculated, heightCalculated);
+
+        const runtimeSceneInstance = new THREE.Scene();
+        const matrixCameraNode = new THREE.PerspectiveCamera(55, widthCalculated / heightCalculated, 0.1, 100);
+        matrixCameraNode.position.set(0, 0, 5);
+
+        // Generation of core floating face matrix placeholder shape
+        const centralCoreGeometry = new THREE.IcosahedronGeometry(1.8, 2);
+        
+        // High-fidelity computational custom runtime shaders logic mapping 
+        const coreMaterialShadersMapping = new THREE.MeshBasicMaterial({
+            color: 0x7B2FFF,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.65
+        });
+
+        const globalMeshAvatarCenterpiece = new THREE.Mesh(centralCoreGeometry, coreMaterialShadersMapping);
+        runtimeSceneInstance.add(globalMeshAvatarCenterpiece);
+
+        // Acceleration Vector Rings mimicking outer orbital limits
+        const orbitalRingGeometry = new THREE.TorusGeometry(2.8, 0.012, 10, 100);
+        const orbitalRingMaterial = new THREE.MeshBasicMaterial({ color: 0x00FFD1, transparent: true, opacity: 0.4 });
+        const globalOrbitalRingMesh = new THREE.Mesh(orbitalRingGeometry, orbitalRingMaterial);
+        globalOrbitalRingMesh.rotation.x = Math.PI / 2.5;
+        runtimeSceneInstance.add(globalOrbitalRingMesh);
+
+        // Core calculation matrix generation for atmospheric elements
+        const cloudCountMetric = 250;
+        const dynamicPositionsMatrixArray = new Float32Array(cloudCountMetric * 3);
+        for(let i = 0; i < cloudCountMetric * 3; i++) {
+            dynamicPositionsMatrixArray[i] = (Math.random() - 0.5) * 12;
+        }
+        const particleBufferGeometry = new THREE.BufferGeometry();
+        particleBufferGeometry.setAttribute('position', new THREE.BufferAttribute(dynamicPositionsMatrixArray, 3));
+        const customParticlesSystemEngine = new THREE.Points(
+            particleBufferGeometry, 
+            new THREE.PointsMaterial({ color: 0x7B2FFF, size: 0.03, transparent: true, opacity: 0.8 })
+        );
+        runtimeSceneInstance.add(customParticlesSystemEngine);
+
+        // --- THEME INTERACTION RIG WITH WEBGL HOOK ---
+        const activeThemeButtonNode = document.getElementById('theme-trigger-engine');
+        const activeThemeTextLabel = document.getElementById('theme-string-label');
+
+        function toggleThemeStatePipeline() {
+            const activeStateMode = document.documentElement.getAttribute('data-theme');
+            if (activeStateMode === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'earthy');
+                activeThemeTextLabel.textContent = "EARTHY DAY ENGINE";
+                coreMaterialShadersMapping.color.setHex(0x2E5A1C);
+                orbitalRingMaterial.color.setHex(0xD25D27);
+                customParticlesSystemEngine.material.color.setHex(0x2E5A1C);
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                activeThemeTextLabel.textContent = "NEON CYBER CORE";
+                coreMaterialShadersMapping.color.setHex(0x7B2FFF);
+                orbitalRingMaterial.color.setHex(0x00FFD1);
+                customParticlesSystemEngine.material.color.setHex(0x7B2FFF);
+            }
+        }
+        activeThemeButtonNode.addEventListener('click', toggleThemeStatePipeline);
+
+        // Mouse Traversal Calculations Matrix
+        let mouseCoordinateX = 0, mouseCoordinateY = 0;
+        window.addEventListener('mousemove', (event) => {
+            mouseCoordinateX = (event.clientX / window.innerWidth - 0.5) * 2;
+            mouseCoordinateY = -(event.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        // --- SCROLL MATRIX ENGINE INTERACTION HOOK ---
+        // Maps absolute scroll fraction to 3D rotation acceleration vectors and vertical downward axis tilt
+        window.addEventListener('scroll', () => {
+            const verticalScrollTop = window.scrollY;
+            const absoluteMaximumScrollLimit = document.documentElement.scrollHeight - window.innerHeight;
+            const computedScrollFraction = absoluteMaximumScrollLimit > 0 ? (verticalScrollTop / absoluteMaximumScrollLimit) : 0;
+
+            // Mathematical translation: Spin up to 720 degrees horizontally, tilt downward up to 45 degrees
+            globalMeshAvatarCenterpiece.rotation.y = computedScrollFraction * Math.PI * 4;
+            globalMeshAvatarCenterpiece.rotation.x = computedScrollFraction * (Math.PI / 4);
+            
+            // Dynamic WebGL position modifications based on depth progression
+            globalMeshAvatarCenterpiece.position.y = -computedScrollFraction * 1.5;
+        });
+
+        window.addEventListener('resize', () => {
+            widthCalculated = containerHost.offsetWidth;
+            heightCalculated = containerHost.offsetHeight;
+            
+            webglRendererInstance.setSize(widthCalculated, heightCalculated);
+            matrixCameraNode.aspect = widthCalculated / heightCalculated;
+            matrixCameraNode.updateProjectionMatrix();
+        });
+
+        // --- RUNTIME WEBGL EXECUTION FRAME RENDERING LOOP ---
+        (function continuousRenderEngineLoop(){
+            requestAnimationFrame(continuousRenderEngineLoop);
+            
+            // Incremental baseline drift configuration
+            globalMeshAvatarCenterpiece.rotation.y += 0.002;
+            globalOrbitalRingMesh.rotation.z -= 0.001;
+            customParticlesSystemEngine.rotation.y += 0.0004;
+
+            // Delayed tracking interpolation to smooth camera tracking responses
+            matrixCameraNode.position.x += (mouseCoordinateX * 0.7 - matrixCameraNode.position.x) * 0.05;
+            matrixCameraNode.position.y += (mouseCoordinateY * 0.5 - matrixCameraNode.position.y) * 0.05;
+            matrixCameraNode.lookAt(runtimeSceneInstance.position);
+
+            webglRendererInstance.render(runtimeSceneInstance, matrixCameraNode);
+        })();
+    </script>
+</body>
+  </html>
